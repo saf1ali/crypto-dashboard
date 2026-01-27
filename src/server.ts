@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import path from 'path';
+import { CryptoPrice, CoinGeckoResponse, SUPPORTED_COINS } from './types';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -33,15 +34,14 @@ app.get('/api/prices/stream', (req: Request, res: Response) => {
 });
 
 // Fetch prices from CoinGecko and broadcast to all clients
-async function fetchAndBroadcastPrices() {
-  const coins = ['bitcoin', 'ethereum', 'solana', 'cardano', 'dogecoin'];
-  const url = `https://api.coingecko.com/api/v3/simple/price?ids=${coins.join(',')}&vs_currencies=usd&include_24hr_change=true`;
+async function fetchAndBroadcastPrices(): Promise<void> {
+  const url = `https://api.coingecko.com/api/v3/simple/price?ids=${SUPPORTED_COINS.join(',')}&vs_currencies=usd&include_24hr_change=true`;
 
   try {
     const response = await fetch(url);
-    const data = await response.json();
+    const data: CoinGeckoResponse = await response.json();
 
-    const prices = Object.entries(data).map(([coin, values]: [string, any]) => ({
+    const prices: CryptoPrice[] = Object.entries(data).map(([coin, values]) => ({
       coin,
       price: values.usd,
       change24h: values.usd_24h_change,
