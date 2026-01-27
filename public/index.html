@@ -13,28 +13,35 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
       min-height: 100vh;
       color: #fff;
-      padding: 2rem;
+      padding: 1.5rem;
     }
 
     .container {
-      max-width: 1200px;
+      max-width: 1400px;
       margin: 0 auto;
     }
 
     header {
       text-align: center;
-      margin-bottom: 3rem;
+      margin-bottom: 2rem;
     }
 
     h1 {
       font-size: 2.5rem;
       margin-bottom: 0.5rem;
-      background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+      background: linear-gradient(90deg, #00d4ff, #7b2cbf, #ff006e);
+      background-size: 200% auto;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      animation: gradient 3s ease infinite;
+    }
+
+    @keyframes gradient {
+      0%, 100% { background-position: 0% center; }
+      50% { background-position: 100% center; }
     }
 
     .status {
@@ -42,7 +49,8 @@
       align-items: center;
       gap: 0.5rem;
       padding: 0.5rem 1rem;
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 2rem;
       font-size: 0.875rem;
     }
@@ -57,6 +65,7 @@
 
     .status-dot.connected {
       background: #00ff88;
+      box-shadow: 0 0 10px #00ff88;
     }
 
     @keyframes pulse {
@@ -64,84 +73,203 @@
       50% { opacity: 0.5; }
     }
 
+    /* Market Summary */
+    .market-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .summary-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 1rem;
+      padding: 1.25rem;
+      text-align: center;
+    }
+
+    .summary-label {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.5);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.5rem;
+    }
+
+    .summary-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #00d4ff;
+    }
+
+    /* Grid */
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 1.5rem;
     }
 
     .card {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 1rem;
       padding: 1.5rem;
-      transition: transform 0.2s, box-shadow 0.2s;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+      opacity: 0;
+      transition: opacity 0.3s;
     }
 
     .card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 8px 32px rgba(0, 212, 255, 0.2);
+      border-color: rgba(0, 212, 255, 0.3);
+      box-shadow: 0 12px 40px rgba(0, 212, 255, 0.15);
+    }
+
+    .card:hover::before {
+      opacity: 1;
     }
 
     .card-header {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      justify-content: space-between;
       margin-bottom: 1rem;
+    }
+
+    .coin-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
     }
 
     .coin-icon {
       width: 48px;
       height: 48px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.1);
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(123, 44, 191, 0.2));
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .coin-name {
-      font-size: 1.25rem;
+      font-size: 1.1rem;
       font-weight: 600;
       text-transform: capitalize;
     }
 
     .coin-symbol {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .rank {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+      font-size: 0.75rem;
       color: rgba(255, 255, 255, 0.6);
-      font-size: 0.875rem;
+    }
+
+    .price-section {
+      margin-bottom: 1rem;
     }
 
     .price {
       font-size: 2rem;
       font-weight: 700;
       margin-bottom: 0.5rem;
+      transition: color 0.3s;
+    }
+
+    .price.flash-up {
+      color: #00ff88;
+    }
+
+    .price.flash-down {
+      color: #ff4444;
     }
 
     .change {
       display: inline-flex;
       align-items: center;
       gap: 0.25rem;
-      padding: 0.25rem 0.75rem;
-      border-radius: 1rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 0.5rem;
       font-size: 0.875rem;
-      font-weight: 500;
+      font-weight: 600;
     }
 
     .change.positive {
-      background: rgba(0, 255, 136, 0.2);
+      background: rgba(0, 255, 136, 0.15);
       color: #00ff88;
     }
 
     .change.negative {
-      background: rgba(255, 68, 68, 0.2);
+      background: rgba(255, 68, 68, 0.15);
       color: #ff4444;
     }
 
-    .updated {
-      margin-top: 1rem;
-      font-size: 0.75rem;
+    /* Sparkline */
+    .sparkline-container {
+      height: 60px;
+      margin: 1rem 0;
+      position: relative;
+    }
+
+    .sparkline {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Stats */
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 0.7rem;
       color: rgba(255, 255, 255, 0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-value {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .updated {
+      text-align: center;
+      margin-top: 1rem;
+      font-size: 0.7rem;
+      color: rgba(255, 255, 255, 0.3);
     }
 
     .loading {
@@ -151,8 +279,8 @@
     }
 
     .spinner {
-      width: 40px;
-      height: 40px;
+      width: 48px;
+      height: 48px;
       border: 3px solid rgba(255, 255, 255, 0.1);
       border-top-color: #00d4ff;
       border-radius: 50%;
@@ -162,6 +290,24 @@
 
     @keyframes spin {
       to { transform: rotate(360deg); }
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 0.8rem;
+    }
+
+    footer a {
+      color: #00d4ff;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
@@ -175,12 +321,35 @@
       </div>
     </header>
 
+    <div class="market-summary" id="marketSummary">
+      <div class="summary-card">
+        <div class="summary-label">Total Market Cap</div>
+        <div class="summary-value" id="totalMarketCap">--</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">24h Volume</div>
+        <div class="summary-value" id="totalVolume">--</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Active Coins</div>
+        <div class="summary-value" id="activeCoins">5</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Update Interval</div>
+        <div class="summary-value">10s</div>
+      </div>
+    </div>
+
     <div class="grid" id="pricesGrid">
       <div class="loading">
         <div class="spinner"></div>
         <p>Connecting to price stream...</p>
       </div>
     </div>
+
+    <footer>
+      Built with Server-Sent Events &bull; Data from <a href="https://coingecko.com" target="_blank">CoinGecko</a>
+    </footer>
   </div>
 
   <script>
@@ -200,15 +369,32 @@
       dogecoin: 'DOGE'
     };
 
+    const COIN_COLORS = {
+      bitcoin: '#f7931a',
+      ethereum: '#627eea',
+      solana: '#00ffa3',
+      cardano: '#0033ad',
+      dogecoin: '#c3a634'
+    };
+
     let eventSource = null;
+    let previousPrices = {};
 
     function formatPrice(price) {
-      if (price >= 1) {
+      if (price >= 1000) {
         return new Intl.NumberFormat('en-US', {
           style: 'currency',
           currency: 'USD',
           minimumFractionDigits: 2,
           maximumFractionDigits: 2
+        }).format(price);
+      }
+      if (price >= 1) {
+        return new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 4
         }).format(price);
       }
       return new Intl.NumberFormat('en-US', {
@@ -217,6 +403,13 @@
         minimumFractionDigits: 4,
         maximumFractionDigits: 6
       }).format(price);
+    }
+
+    function formatLargeNumber(num) {
+      if (num >= 1e12) return '$' + (num / 1e12).toFixed(2) + 'T';
+      if (num >= 1e9) return '$' + (num / 1e9).toFixed(2) + 'B';
+      if (num >= 1e6) return '$' + (num / 1e6).toFixed(2) + 'M';
+      return '$' + num.toLocaleString();
     }
 
     function formatChange(change) {
@@ -228,25 +421,127 @@
       return new Date(timestamp).toLocaleTimeString();
     }
 
-    function renderPrices(prices) {
+    function drawSparkline(canvas, data, color) {
+      const ctx = canvas.getContext('2d');
+      const width = canvas.width;
+      const height = canvas.height;
+      const padding = 4;
+
+      ctx.clearRect(0, 0, width, height);
+
+      if (data.length < 2) return;
+
+      const min = Math.min(...data);
+      const max = Math.max(...data);
+      const range = max - min || 1;
+
+      // Create gradient
+      const gradient = ctx.createLinearGradient(0, 0, 0, height);
+      gradient.addColorStop(0, color + '40');
+      gradient.addColorStop(1, color + '00');
+
+      // Draw area
+      ctx.beginPath();
+      ctx.moveTo(padding, height - padding);
+
+      data.forEach((value, index) => {
+        const x = padding + (index / (data.length - 1)) * (width - padding * 2);
+        const y = height - padding - ((value - min) / range) * (height - padding * 2);
+        ctx.lineTo(x, y);
+      });
+
+      ctx.lineTo(width - padding, height - padding);
+      ctx.closePath();
+      ctx.fillStyle = gradient;
+      ctx.fill();
+
+      // Draw line
+      ctx.beginPath();
+      data.forEach((value, index) => {
+        const x = padding + (index / (data.length - 1)) * (width - padding * 2);
+        const y = height - padding - ((value - min) / range) * (height - padding * 2);
+        if (index === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.stroke();
+
+      // Draw end point
+      const lastX = width - padding;
+      const lastY = height - padding - ((data[data.length - 1] - min) / range) * (height - padding * 2);
+      ctx.beginPath();
+      ctx.arc(lastX, lastY, 4, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(lastX, lastY, 6, 0, Math.PI * 2);
+      ctx.strokeStyle = color + '60';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    function renderPrices(prices, totals) {
       const grid = document.getElementById('pricesGrid');
 
-      grid.innerHTML = prices.map(({ coin, price, change24h, timestamp }) => `
-        <div class="card">
-          <div class="card-header">
-            <div class="coin-icon">${COIN_ICONS[coin] || '?'}</div>
-            <div>
-              <div class="coin-name">${coin}</div>
-              <div class="coin-symbol">${COIN_SYMBOLS[coin] || coin.toUpperCase()}</div>
+      // Update market summary
+      document.getElementById('totalMarketCap').textContent = formatLargeNumber(totals.marketCap);
+      document.getElementById('totalVolume').textContent = formatLargeNumber(totals.volume);
+
+      grid.innerHTML = prices.map(({ coin, price, change24h, marketCap, volume24h, history, timestamp }, index) => {
+        const priceChanged = previousPrices[coin] && previousPrices[coin] !== price;
+        const priceUp = previousPrices[coin] && price > previousPrices[coin];
+        const flashClass = priceChanged ? (priceUp ? 'flash-up' : 'flash-down') : '';
+        previousPrices[coin] = price;
+
+        return `
+          <div class="card">
+            <div class="card-header">
+              <div class="coin-info">
+                <div class="coin-icon" style="border-color: ${COIN_COLORS[coin]}40">${COIN_ICONS[coin] || '?'}</div>
+                <div>
+                  <div class="coin-name">${coin}</div>
+                  <div class="coin-symbol">${COIN_SYMBOLS[coin] || coin.toUpperCase()}</div>
+                </div>
+              </div>
+              <span class="rank">#${index + 1}</span>
             </div>
+            <div class="price-section">
+              <div class="price ${flashClass}" id="price-${coin}">${formatPrice(price)}</div>
+              <span class="change ${change24h >= 0 ? 'positive' : 'negative'}">
+                ${change24h >= 0 ? '▲' : '▼'} ${formatChange(change24h)}
+              </span>
+            </div>
+            <div class="sparkline-container">
+              <canvas class="sparkline" id="sparkline-${coin}" width="300" height="60"></canvas>
+            </div>
+            <div class="stats">
+              <div class="stat">
+                <div class="stat-label">Market Cap</div>
+                <div class="stat-value">${formatLargeNumber(marketCap)}</div>
+              </div>
+              <div class="stat">
+                <div class="stat-label">24h Volume</div>
+                <div class="stat-value">${formatLargeNumber(volume24h)}</div>
+              </div>
+            </div>
+            <div class="updated">Updated: ${formatTime(timestamp)}</div>
           </div>
-          <div class="price">${formatPrice(price)}</div>
-          <span class="change ${change24h >= 0 ? 'positive' : 'negative'}">
-            ${change24h >= 0 ? '↑' : '↓'} ${formatChange(change24h)}
-          </span>
-          <div class="updated">Updated: ${formatTime(timestamp)}</div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
+
+      // Draw sparklines after DOM update
+      requestAnimationFrame(() => {
+        prices.forEach(({ coin, history, change24h }) => {
+          const canvas = document.getElementById(`sparkline-${coin}`);
+          if (canvas && history.length > 1) {
+            const color = change24h >= 0 ? '#00ff88' : '#ff4444';
+            drawSparkline(canvas, history, color);
+          }
+        });
+      });
     }
 
     function setStatus(connected) {
@@ -271,19 +566,17 @@
         if (data.type === 'connected') {
           setStatus(true);
         } else if (data.type === 'prices') {
-          renderPrices(data.data);
+          renderPrices(data.data, data.totals || { marketCap: 0, volume: 0 });
         }
       };
 
       eventSource.onerror = () => {
         setStatus(false);
         eventSource.close();
-        // Reconnect after 5 seconds
         setTimeout(connect, 5000);
       };
     }
 
-    // Start connection
     connect();
   </script>
 </body>

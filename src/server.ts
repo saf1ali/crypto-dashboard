@@ -1,6 +1,5 @@
 import express, { Request, Response } from 'express';
 import path from 'path';
-import { CryptoPrice, CoinGeckoResponse, SUPPORTED_COINS } from './types';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -11,45 +10,90 @@ app.use(express.static(path.join(__dirname, '../public')));
 // Store connected clients
 const clients: Set<Response> = new Set();
 
+// Store price history for sparklines (last 20 data points per coin)
+const priceHistory: Map<string, number[]> = new Map();
+const MAX_HISTORY = 20;
+
+const SUPPORTED_COINS = ['bitcoin', 'ethereum', 'solana', 'cardano', 'dogecoin'];
+
+interface CoinData {
+  usd: number;
+  usd_24h_change: number;
+  usd_market_cap: number;
+  usd_24h_vol: number;
+}
+
+interface CryptoPrice {
+  coin: string;
+  price: number;
+  change24h: number;
+  marketCap: number;
+  volume24h: number;
+  history: number[];
+  timestamp: number;
+}
+
 // SSE endpoint for real-time price updates
 app.get('/api/prices/stream', (req: Request, res: Response) => {
-  // Set SSE headers
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
   res.setHeader('Access-Control-Allow-Origin', '*');
 
-  // Add client to set
   clients.add(res);
   console.log(`Client connected. Total clients: ${clients.size}`);
 
-  // Send initial connection message
   res.write(`data: ${JSON.stringify({ type: 'connected', message: 'Stream connected' })}\n\n`);
 
-  // Remove client on disconnect
   req.on('close', () => {
     clients.delete(res);
     console.log(`Client disconnected. Total clients: ${clients.size}`);
   });
 });
 
-// Fetch prices from CoinGecko and broadcast to all clients
+// Fetch prices with market data from CoinGecko
 async function fetchAndBroadcastPrices(): Promise<void> {
-  const url = `https://api.coingecko.com/api/v3/simple/price?ids=${SUPPORTED_COINS.join(',')}&vs_currencies=usd&include_24hr_change=true`;
+  const url = `https://api.coingecko.com/api/v3/simple/price?ids=${SUPPORTED_COINS.join(',')}&vs_currencies=usd&include_24hr_change=true&include_market_cap=true&include_24hr_vol=true`;
 
   try {
     const response = await fetch(url);
-    const data = await response.json() as CoinGeckoResponse;
+    const data = await response.json() as Record<string, CoinData>;
 
-    const prices: CryptoPrice[] = Object.entries(data).map(([coin, values]) => ({
-      coin,
-      price: values.usd,
-      change24h: values.usd_24h_change,
-      timestamp: Date.now()
-    }));
+    const prices: CryptoPrice[] = Object.entries(data).map(([coin, values]) => {
+      // Update price history
+      if (!priceHistory.has(coin)) {
+        priceHistory.set(coin, []);
+      }
+      const history = priceHistory.get(coin)!;
+      history.push(values.usd);
+      if (history.length > MAX_HISTORY) {
+        history.shift();
+      }
 
-    // Broadcast to all connected clients
-    const message = JSON.stringify({ type: 'prices', data: prices });
+      return {
+        coin,
+        price: values.usd,
+        change24h: values.usd_24h_change || 0,
+        marketCap: values.usd_market_cap || 0,
+        volume24h: values.usd_24h_vol || 0,
+        history: [...history],
+        timestamp: Date.now()
+      };
+    });
+
+    // Sort by market cap
+    prices.sort((a, b) => b.marketCap - a.marketCap);
+
+    // Calculate totals
+    const totalMarketCap = prices.reduce((sum, p) => sum + p.marketCap, 0);
+    const totalVolume = prices.reduce((sum, p) => sum + p.volume24h, 0);
+
+    const message = JSON.stringify({
+      type: 'prices',
+      data: prices,
+      totals: { marketCap: totalMarketCap, volume: totalVolume }
+    });
+
     clients.forEach(client => {
       client.write(`data: ${message}\n\n`);
     });
@@ -60,13 +104,11 @@ async function fetchAndBroadcastPrices(): Promise<void> {
   }
 }
 
-// Fetch prices every 10 seconds (CoinGecko free tier limit)
+// Fetch prices every 10 seconds
 setInterval(fetchAndBroadcastPrices, 10000);
-
-// Initial fetch on startup
 fetchAndBroadcastPrices();
 
-// Health check endpoint
+// Health check
 app.get('/api/health', (req: Request, res: Response) => {
   res.json({ status: 'ok', clients: clients.size });
 });
