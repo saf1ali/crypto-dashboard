@@ -39,7 +39,7 @@ async function fetchAndBroadcastPrices(): Promise<void> {
 
   try {
     const response = await fetch(url);
-    const data: CoinGeckoResponse = await response.json();
+    const data = await response.json() as CoinGeckoResponse;
 
     const prices: CryptoPrice[] = Object.entries(data).map(([coin, values]) => ({
       coin,
