@@ -1,22 +1,43 @@
 {
   "name": "crypto-dashboard",
-  "version": "1.0.0",
-  "description": "Real-time cryptocurrency price dashboard with Server-Sent Events",
+  "version": "2.0.0",
+  "description": "Production-grade cryptocurrency analytics platform with real-time prices, interactive charts, watchlists, and multi-source data integration",
   "main": "dist/server.js",
   "scripts": {
+    "predev": "npx kill-port 3000 || true",
+    "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "dev": "tsc && node dist/server.js"
+    "lint": "tsc --noEmit"
   },
-  "keywords": ["crypto", "sse", "real-time", "typescript", "dashboard"],
+  "keywords": [
+    "crypto",
+    "cryptocurrency",
+    "bitcoin",
+    "ethereum",
+    "sse",
+    "real-time",
+    "typescript",
+    "dashboard",
+    "analytics",
+    "charts"
+  ],
   "author": "Safwan Ali",
   "license": "MIT",
   "dependencies": {
+    "axios": "^1.6.2",
+    "better-sqlite3": "^9.2.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
     "express": "^4.18.2"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.8",
+    "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
-    "@types/node": "^20.10.0",
-    "typescript": "^5.3.0"
+    "@types/node": "^20.10.4",
+    "kill-port": "^2.0.1",
+    "tsx": "^4.6.2",
+    "typescript": "^5.3.2"
   }
 }

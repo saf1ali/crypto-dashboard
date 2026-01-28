@@ -3,3 +3,16 @@ dist/
 .env
 *.log
 .DS_Store
+
+# SQLite database
+data/
+
+# Frontend build
+frontend/dist/
+frontend/node_modules/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
